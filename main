@@ -1,5 +1,5 @@
 import os
-
+import random
 
 class Student:#Student数据类：用于存储学生信息，初始化学生的五种属性
     
@@ -73,6 +73,33 @@ class ExamSystem:
         else:
             print(f"\n✗ 错误：学号 '{student_id}' 不存在！")
             print("  请检查学号是否正确后重新输入")
+     def random_call(self, count):
+    try:#使用try-except捕获非数字输入异常
+        count = int(count)
+        
+        if count <= 0:
+            print(f"\n✗ 错误：点名人数必须大于0！")
+            return []
+        
+        if count > self.total_count:#验证数量是否合法（>0且不超过总人数）
+            print(f"\n✗ 错误：点名人数不能超过总人数 {self.total_count}！")
+            return []
+        
+        all_students = list(self.students.values())
+        selected = random.sample(all_students, count)#使用random.sample实现不重复随机抽取
+        
+        print("\n" + "=" * 50)
+        print(f"随机点名结果（共{count}人）：")
+        print("=" * 50)
+        for i, student in enumerate(selected, 1):
+            print(f"{i:2d}. {student.name} ({student.student_id}) - {student.class_name} - {student.college}")#格式化输出点名结果
+        print("=" * 50)
+        
+        return selected
+        
+    except ValueError:
+        print(f"\n✗ 错误：请输入有效的数字！")
+        return []
 
 
 def main():
