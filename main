@@ -101,13 +101,12 @@ class ExamSystem:
         print(f"\n✗ 错误：请输入有效的数字！")
         return []
 
-
 def main():
     print("=" * 50)
-    print("    学生信息管理系统 - Stage1")
+    print("    学生信息管理系统")
     print("=" * 50)
     
-    file_path = "人工智能编程语言学生名单.txt"# 定义学生名单文件路径
+    file_path = "人工智能编程语言学生名单.txt"#定义学生名单文件使用路径
     
     try:
         system = ExamSystem(file_path)
@@ -117,22 +116,31 @@ def main():
     
     while True:
         print("\n" + "-" * 40)
-        print("功能：学号查找")
-        print("提示：输入 'q' 或 'quit' 退出程序")
+        print("功能菜单：")
+        print("  1. 查找学生信息")
+        print("  2. 随机点名")      # 新增菜单项
+        print("  3. 退出系统")      # 原退出改为3
         print("-" * 40)
         
-        student_id = input("请输入学号（8位数字）：").strip()
+        choice = input("请选择功能（1-3）：").strip()
         
-        if student_id.lower() in ['q', 'quit', 'exit']:
-            print("\n感谢使用，再见！")
+        if choice == "1":
+            student_id = input("请输入学号（8位数字）：").strip()
+            
+            if not ExamSystem.validate_student_id(student_id):
+                print(f"\n✗ 学号格式错误：'{student_id}' 不是有效的8位数字学号")
+                continue
+            
+            system.display_student_info(student_id)# 格式正确，调用display_student_info显示学生信息
+        
+        elif choice == "2":          # 新增分支
+            print(f"\n当前总人数：{system.total_count}")
+            count = input(f"请输入需要点名的学生数量（1-{system.total_count}）：").strip()
+            system.random_call(count)
+        
+        elif choice == "3":
+            print("\n感谢使用本系统，再见！")
             break
         
-        if not ExamSystem.validate_student_id(student_id):
-            print(f"\n✗ 学号格式错误：'{student_id}' 不是有效的8位数字学号")
-            continue
-        
-        system.display_student_info(student_id)# 格式正确，调用display_student_info显示学生信息
-
-
-if __name__ == "__main__":
-    main()
+        else:
+            print(f"\n✗ 错误：请输入1-3之间的数字！")
