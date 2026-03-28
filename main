@@ -1,7 +1,7 @@
 import os
 
 
-class Student:
+class Student:#Student数据类：用于存储学生信息，初始化学生的五种属性
     
     def __init__(self, student_id, name, gender, class_name, college):
         self.student_id = student_id
@@ -10,7 +10,7 @@ class Student:
         self.class_name = class_name
         self.college = college
     
-    def __str__(self):
+    def __str__(self):#魔术方法：定义对象的字符串表示，适用于返回格式化的学生信息，便于用户阅读
         return (f"学号：{self.student_id}\n"
                 f"姓名：{self.name}\n"
                 f"性别：{self.gender}\n"
@@ -20,7 +20,7 @@ class Student:
 
 class ExamSystem:
     
-    @staticmethod
+    @staticmethod#这是一个验证学号格式的静态方法，通过类名直接调用，不用创建实际的例子，用于对学号进行基础格式校验
     def validate_student_id(student_id):
         if student_id and student_id.isdigit() and len(student_id) == 8:
             return True
@@ -31,13 +31,13 @@ class ExamSystem:
         self.total_count = 0
         self.load_students(file_path)
     
-    def load_students(self, file_path):
+    def load_students(self, file_path):#用于从文本文件加载学生信息
         try:
-            with open(file_path, 'r', encoding='utf-8') as f:
+            with open(file_path, 'r', encoding='utf-8') as f:# 使用with open自动管理文件资源，encoding='utf-8'确保中文正常读取
                 lines = f.readlines()
                 
-                for line in lines[1:]:
-                    parts = line.strip().split(',')
+                for line in lines[1:]:#从第二行开始读取是为了跳过第一行标题行
+                    parts = line.strip().split(',')# # strip()去除行首尾的空白字符（包括换行符），split(',')按逗号分割，返回字符串列表
                     
                     if len(parts) == 5:
                         student_id = parts[0].strip()
@@ -46,9 +46,7 @@ class ExamSystem:
                         class_name = parts[3].strip()
                         college = parts[4].strip()
                         
-                        self.students[student_id] = Student(
-                            student_id, name, gender, class_name, college
-                        )
+                        self.students[student_id] = Student( student_id, name, gender, class_name, college)# 创建Student对象，存入字典
             
             self.total_count = len(self.students)
             print(f"✓ 成功加载 {self.total_count} 名学生信息")
@@ -67,7 +65,7 @@ class ExamSystem:
     def display_student_info(self, student_id):
         student = self.find_student(student_id)
         
-        if student:
+        if student:# 找到学生，打印分隔线和信息
             print("\n" + "=" * 40)
             print("学生信息如下：")
             print(student)
@@ -82,7 +80,7 @@ def main():
     print("    学生信息管理系统 - Stage1")
     print("=" * 50)
     
-    file_path = "人工智能编程语言学生名单.txt"
+    file_path = "人工智能编程语言学生名单.txt"# 定义学生名单文件路径
     
     try:
         system = ExamSystem(file_path)
@@ -106,7 +104,7 @@ def main():
             print(f"\n✗ 学号格式错误：'{student_id}' 不是有效的8位数字学号")
             continue
         
-        system.display_student_info(student_id)
+        system.display_student_info(student_id)# 格式正确，调用display_student_info显示学生信息
 
 
 if __name__ == "__main__":
