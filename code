@@ -1,1 +1,113 @@
+import os
 
+
+class Student:
+    
+    def __init__(self, student_id, name, gender, class_name, college):
+        self.student_id = student_id
+        self.name = name
+        self.gender = gender
+        self.class_name = class_name
+        self.college = college
+    
+    def __str__(self):
+        return (f"学号：{self.student_id}\n"
+                f"姓名：{self.name}\n"
+                f"性别：{self.gender}\n"
+                f"班级：{self.class_name}\n"
+                f"学院：{self.college}")
+
+
+class ExamSystem:
+    
+    @staticmethod
+    def validate_student_id(student_id):
+        if student_id and student_id.isdigit() and len(student_id) == 8:
+            return True
+        return False
+    
+    def __init__(self, file_path):
+        self.students = {}
+        self.total_count = 0
+        self.load_students(file_path)
+    
+    def load_students(self, file_path):
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                
+                for line in lines[1:]:
+                    parts = line.strip().split(',')
+                    
+                    if len(parts) == 5:
+                        student_id = parts[0].strip()
+                        name = parts[1].strip()
+                        gender = parts[2].strip()
+                        class_name = parts[3].strip()
+                        college = parts[4].strip()
+                        
+                        self.students[student_id] = Student(
+                            student_id, name, gender, class_name, college
+                        )
+            
+            self.total_count = len(self.students)
+            print(f"✓ 成功加载 {self.total_count} 名学生信息")
+            
+        except FileNotFoundError:
+            print(f"✗ 错误：文件 '{file_path}' 不存在！")
+            print("  请确保文件在程序根目录下")
+            raise
+        except Exception as e:
+            print(f"✗ 加载文件时发生未知错误：{e}")
+            raise
+    
+    def find_student(self, student_id):
+        return self.students.get(student_id)
+    
+    def display_student_info(self, student_id):
+        student = self.find_student(student_id)
+        
+        if student:
+            print("\n" + "=" * 40)
+            print("学生信息如下：")
+            print(student)
+            print("=" * 40)
+        else:
+            print(f"\n✗ 错误：学号 '{student_id}' 不存在！")
+            print("  请检查学号是否正确后重新输入")
+
+
+def main():
+    print("=" * 50)
+    print("    学生信息管理系统 - Stage1")
+    print("=" * 50)
+    
+    file_path = "人工智能编程语言学生名单.txt"
+    
+    try:
+        system = ExamSystem(file_path)
+    except Exception as e:
+        print(f"\n系统初始化失败，程序无法继续运行")
+        return
+    
+    while True:
+        print("\n" + "-" * 40)
+        print("功能：学号查找")
+        print("提示：输入 'q' 或 'quit' 退出程序")
+        print("-" * 40)
+        
+        student_id = input("请输入学号（8位数字）：").strip()
+        
+        if student_id.lower() in ['q', 'quit', 'exit']:
+            print("\n感谢使用，再见！")
+            break
+        
+        if not ExamSystem.validate_student_id(student_id):
+            print(f"\n✗ 学号格式错误：'{student_id}' 不是有效的8位数字学号")
+            continue
+        
+        system.display_student_info(student_id)
+
+
+if __name__ == "__main__":
+    main()
