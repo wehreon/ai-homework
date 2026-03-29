@@ -144,6 +144,69 @@ class ExamSystem:
             print(f"\n✗ 生成考场安排表时发生错误：{e}")
             return None
 
+    def generate_admission_tickets(self, arranged_students):
+        """
+        生成准考证目录与文件
+        功能：创建“准考证”文件夹，为每个学生生成独立的准考证文件
+
+        参数：arranged_students - 已打乱顺序的学生列表（考场安排顺序）
+
+        核心逻辑：
+        1. 使用os.makedirs创建准考证文件夹（如果不存在）
+        2. 遍历打乱后的学生列表，按座位号生成文件
+        3. 文件名格式：01.txt、02.txt（对应座位号）
+        4. 每个文件写入考场座位号、姓名、学号
+        5. 使用try-except处理文件夹创建和文件写入异常
+
+        返回值：成功生成的准考证文件数量
+        """
+        try:
+            # 定义准考证文件夹名称
+            folder_name = "准考证"
+
+            # 创建文件夹（如果文件夹已存在，不会报错；如果父目录不存在，会一并创建）
+            # exist_ok=True表示如果文件夹已存在，不抛出异常
+            os.makedirs(folder_name, exist_ok=True)
+            print(f"\n✓ 已创建文件夹：{folder_name}")
+
+            # 统计成功生成的文件数量
+            success_count = 0
+
+            # 遍历每个学生，按座位号生成准考证文件
+            # arranged_students是已经随机打乱并分配了座位号的列表
+            # enumerate从1开始生成座位号，与考场安排表一致
+            for seat_num, student in enumerate(arranged_students, 1):
+                # 构建文件名：座位号占2位，不足2位前面补0（如01.txt、02.txt...）
+                filename = os.path.join(folder_name, f"{seat_num:02d}.txt")
+
+                # 写入文件内容
+                with open(filename, 'w', encoding='utf-8') as f:
+                    # 写入准考证格式内容
+                    f.write("=" * 40 + "\n")
+                    f.write("        考 生 准 考 证\n")
+                    f.write("=" * 40 + "\n\n")
+                    f.write(f"考场座位号：{seat_num}\n")
+                    f.write(f"姓    名：{student.name}\n")
+                    f.write(f"学    号：{student.student_id}\n")
+                    f.write("\n" + "=" * 40 + "\n")
+                    # 添加生成时间，便于追溯
+                    f.write(f"生成时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+
+                success_count += 1
+
+            print(f"✓ 成功生成 {success_count} 个准考证文件")
+            print(f"  文件位置：{os.path.abspath(folder_name)}")
+
+            return success_count
+
+        except PermissionError:
+            print(f"\n✗ 权限错误：无法创建文件夹或写入文件")
+            print("  请检查程序运行目录是否有写入权限")
+            return 0
+        except Exception as e:
+            print(f"\n✗ 生成准考证文件时发生错误：{e}")
+            return 0
+
 
 def main():
     print("=" * 50)
@@ -163,8 +226,8 @@ def main():
         print("功能菜单：")
         print("  1. 查找学生信息")
         print("  2. 随机点名")  # 新增菜单项
-        print("  3. 生成考场安排表")  # 新增菜单项
-        print("  4. 退出系统")  # 原退出改为4
+        print("  3. 生成考场安排表及准考证")  # 修改：生成考场安排表 + 准考证
+        print("  4. 退出系统")  # 退出改为4
         print("-" * 40)
 
         choice = input("请选择功能（1-4）：").strip()
@@ -183,8 +246,15 @@ def main():
             count = input(f"请输入需要点名的学生数量（1-{system.total_count}）：").strip()
             system.random_call(count)
 
-        elif choice == "3":  # 新增分支：生成考场安排表
-            system.generate_exam_arrangement()
+        elif choice == "3":  # 修改分支：生成考场安排表 + 准考证
+            # 第一步：生成考场安排表
+            arranged_students = system.generate_exam_arrangement()
+
+            # 第二步：如果考场安排表生成成功，则继续生成准考证
+            if arranged_students:
+                system.generate_admission_tickets(arranged_students)
+            else:
+                print("\n✗ 考场安排表生成失败，无法生成准考证")
 
         elif choice == "4":
             print("\n感谢使用本系统，再见！")
