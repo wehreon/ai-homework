@@ -58,4 +58,31 @@ C:\Users\adp\AppData\Local\Programs\Python\Python314\python.exe C:\Users\adp\PyC
 traceback没有具体指示错误的具体位置，但根据自己的感受能够大概感觉出是反复粘贴导致的缩进的问题，将报错喂给AI后我更加确信了这一判断，最终调整了def main的缩进位置，解决了这一问题。
 ## 4. 人工代码审查 (Code Review)
 （请贴出一段 AI 生成的核心逻辑代码，并加上你自己的逐行中文注释，证明你完全理解了它的运行机制）```python
+    def random_call(self, count):#定义随机点名方法
+        try:  # 使用try-except捕获非数字输入异常
+            count = int(count)#将用户输入转换为整数
+
+            if count <= 0:#判断人数是否小于等于0
+                print(f"\n✗ 错误：点名人数必须大于0！")#输出数量错误提示
+                return []#返回空列表提前结束
+
+            if count > self.total_count:  # 验证数量是否合法（>0且不超过总人数）
+                print(f"\n✗ 错误：点名人数不能超过总人数 {self.total_count}！")
+                return []
+
+            all_students = list(self.students.values())#获取所有学生列表
+            selected = random.sample(all_students, count)  # 使用random.sample实现不重复随机抽取
+
+            print("\n" + "=" * 50)#输出分割线，点名结果，分割线
+            print(f"随机点名结果（共{count}人）：")
+            print("=" * 50)
+            for i, student in enumerate(selected, 1):#遍历点名学生，从序号1开始
+                print(f"{i:2d}. {student.name} ({student.student_id}) - {student.class_name} - {student.college}")  # 格式化输出点名结果
+            print("=" * 50)
+
+            return selected#返回点名学生列表
+
+        except ValueError:#捕获Valueerror异常
+            print(f"\n✗ 错误：请输入有效的数字！")#打印错误提示
+            return []
 # 贴入代码及人工注释
